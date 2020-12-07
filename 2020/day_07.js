@@ -12,3 +12,6 @@ const part1 = data.split("\n").map( x => ({ type: x.match( /^(?<bag>.*) bags con
 
 console.log( part1 );
 
+const part2 = data.split("\n").map( x => ({ type: x.match( /^(?<bag>.*) bags contain/ ).groups.bag, contains: Array.from( x.matchAll( /( (?<count>\d) (?<bag>[\w\s]*) bags?[,\.])/g ) ).map(y=>({type:y.groups.bag, count:parseInt(y.groups.count) }) ) }) ).reduce((a,x) => (a[0][x.type]=x.contains) && a, [{}]).map(x => Object.keys(x).reduce( ({todo,res},y)=> todo.length < 1 ? ({todo,res}) : ({todo: todo.slice(1).concat(x[todo[0].type].map(({type,count})=>({type, mult: todo[0].mult * count || 1}))), res: x[todo[0].type].reduce((a,z)=>a+z.count*todo[0].mult,res)}), {todo:[{type:"shiny gold",mult:1}],res:0} ) )[0].res;
+
+console.log( part2 );
