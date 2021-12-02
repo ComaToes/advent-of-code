@@ -1,0 +1,1 @@
+These implementations are intentionally bad. I gave myself the arbitrary constraint of solving using a single chain of method calls, which is ugly but it improved my use of map and reduce in general problem solving. I gave up when this got too cumbersome, but am hoping to finish things up in ./retro with more readable code.
