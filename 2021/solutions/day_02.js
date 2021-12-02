@@ -4,22 +4,22 @@ function part1(data) {
     const commands = lines.map( line => line.split(/\s/) )
                           .map( ([direction, distance]) => ({direction, distance: Number(distance)}));
 
-    const {horizontal, depth} = commands.reduce( (res,command) => {
+    const {horizontal, depth} = commands.reduce( (res, {direction, distance}) => {
 
-        switch( command.direction ) {
+        switch( direction ) {
             case "up": 
-                res.depth -= command.distance;
+                res.depth -= distance;
                 break;
             case "down":
-                res.depth += command.distance;
+                res.depth += distance;
                 break;
             case "forward":
-                res.horizontal += command.distance;
+                res.horizontal += distance;
                 break;
             default:
-                throw new Error(`Invalid Direction ${command.direction}`);
+                throw new Error(`Invalid Direction ${direction}`);
         }
-        
+
         return res;
 
     }, {horizontal: 0, depth: 0} );
@@ -34,21 +34,21 @@ function part2(data) {
     const commands = lines.map( line => line.split(/\s/) )
                           .map( ([direction, distance]) => ({direction, distance: Number(distance)}));
 
-    const {horizontal, depth} = commands.reduce( (res,command) => {
+    const {horizontal, depth} = commands.reduce( (res, {direction, distance}) => {
 
-        switch( command.direction ) {
+        switch( direction ) {
             case "up": 
-                res.aim -= command.distance;
+                res.aim -= distance;
                 break;
             case "down": 
-                res.aim += command.distance; 
+                res.aim += distance; 
                 break;
             case "forward": 
-                res.horizontal += command.distance;
-                res.depth += res.aim * command.distance;
+                res.horizontal += distance;
+                res.depth += res.aim * distance;
                 break;
             default:
-                throw new Error(`Invalid Direction ${command.direction}`);
+                throw new Error(`Invalid Direction ${direction}`);
         }
 
         return res;
