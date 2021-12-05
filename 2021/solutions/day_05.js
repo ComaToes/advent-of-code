@@ -22,12 +22,11 @@ function part1(data) {
 
     straightLines.forEach( ({x1,y1,x2,y2}) => {
         for( let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++ )
-            for( let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++ ) {
+            for( let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++ )
                 grid[y][x]++;
-            }
     });
 
-    const count = grid.reduce( (count, row) => count + row.reduce( (count, value) => count + (value > 1 ? 1 : 0), 0), 0);
+    const count = grid.flat().reduce( (count, value) => count + (value > 1 ? 1 : 0), 0);
 
     return count;
 
@@ -50,15 +49,15 @@ function part2(data) {
         let dy = y2 - y1;
         dy = dy > 0 ? 1 : dy < 0 ? -1 : 0;
         let x = x1, y = y1;
-        do {
-            grid[y][x]++;
+        grid[y][x]++;
+        while( x != x2 || y != y2 ) {
             x += dx;
             y += dy;
-        } while( x != x2 || y != y2 )
-        grid[y][x]++;
+            grid[y][x]++;
+        } 
     });
 
-    const count = grid.reduce( (count, row) => count + row.reduce( (count, value) => count + (value > 1 ? 1 : 0), 0), 0);
+    const count = grid.flat().reduce( (count, value) => count + (value > 1 ? 1 : 0), 0);
 
     return count;
 
