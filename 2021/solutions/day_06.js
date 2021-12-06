@@ -2,13 +2,13 @@ function breedTheFishes(data, duration) {
 
     const initialFish = data.trim().split(",");
 
-    let pop = Array(7).fill(0);
+    const pop = Array(7).fill(0);
 
     initialFish.forEach( age => {
         pop[age]++;
     });
 
-    let spawn = [0, 0];
+    const spawn = [0, 0];
     for( let time = 0; time < duration; time++ ) {
         let i = time % pop.length;
         spawn.push( pop[i] );
