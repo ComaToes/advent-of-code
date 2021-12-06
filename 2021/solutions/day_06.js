@@ -8,12 +8,11 @@ function breedTheFishes(data, duration) {
         pop[age]++;
     });
 
-    let time = 7;
     let spawn = [0, 0];
-    for( let i = 0; i < duration; i++ ) {
-        let j = (i + time) % pop.length;
-        spawn.push( pop[j] );
-        pop[j] += spawn.shift();
+    for( let time = 0; time < duration; time++ ) {
+        let i = time % pop.length;
+        spawn.push( pop[i] );
+        pop[i] += spawn.shift();
     }
 
     return pop.concat(spawn).reduce( (count, p) => count + p, 0 );
