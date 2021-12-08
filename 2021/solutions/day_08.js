@@ -15,9 +15,6 @@ function part2(data) {
     const lines = data.split(/\r?\n/);
     const items = lines.map( line => line.split(" | ") ).map( arr => arr.map( str => str.split(" ").map( str => str.split("").sort().join("") ) ) );
     const alphabet = "abcdefg".split("");
-    const itemsBin = items.map( arr => arr.map( digits => digits.map( digit =>
-        alphabet.reduce( (value, char, i) => value + (digit.indexOf(char) >= 0 ? 1 << i : 0), 0 )
-    ) ) );
 
     return items.reduce( (count, [input, output]) => {
 
@@ -29,6 +26,13 @@ function part2(data) {
                 alphabet.reduce( (value, char, i) => value + (digit.indexOf(char) >= 0 ? 1 << i : 0), 0 ) 
             ]
         );
+
+        const digitRules = [
+            { digit: 3, length: 5, compare: 1 },
+            { digit: 9, length: 6, compare: 3 },
+            { digit: 5, length: 5, compare: 9, matchSelf: true, else: 2 },
+            { digit: 0, length: 6, compare: 1, else: 6 },
+        ];
 
         // 1, 4, 7, 8 by length
         all.forEach( ([digit, digitBin]) => {
@@ -49,59 +53,23 @@ function part2(data) {
             }
         });
 
-        // Find 3 by length and matching 1
-        all.forEach( ([digit, digitBin]) => {
-            if( dict[digit] )
-                return;
-            if( digit.length == 5 && (digitBin & dictBin[1]) == dictBin[1] ) {
-                dict[digit] = 3;
-                dict[3] = digit;
-                dictBin[digitBin] = 3;
-                dictBin[3] = digitBin;
-            }
-        });
-
-        // Find 9
-        all.forEach( ([digit, digitBin]) => {
-            if( dict[digit] )
-                return;
-            if( digit.length == 6 && (digitBin & dictBin[3]) == dictBin[3] ) {
-                dict[digit] = 9;
-                dict[9] = digit;
-                dictBin[digitBin] = 9;
-                dictBin[9] = digitBin;
-            }
-        });
-
-        // Use 9 to determine 5 or 2
-        all.forEach( ([digit, digitBin]) => {
-            if( dict[digit] )
-                return;
-            if( digit.length == 5 ) {
-                if( (digitBin & dictBin[9]) == digitBin )
-                    value = 5
-                else
-                    value = 2;
-                dict[digit] = value;
-                dict[value] = digit;
-                dictBin[digitBin] = value;
-                dictBin[value] = digitBin;
-            }            
-        });
-
-        // 0 and 6
-        all.forEach( ([digit, digitBin]) => {
-            if( dict[digit] )
-                return;
-            if( (digitBin & dictBin[1]) == dictBin[1] )
-                value = 0
-            else
-                value = 6;
-            dict[digit] = value;
-            dict[value] = digit;
-            dictBin[digitBin] = value;
-            dictBin[value] = digitBin;
-        });
+        // Other digits by rules
+        digitRules.forEach( rule => {
+            all.forEach( ([digit, digitBin]) => {
+                if( dict[digit] )
+                    return;
+                const match = rule.matchSelf ? digitBin : dictBin[rule.compare];
+                if( digit.length == rule.length ) {
+                    if ( (digitBin & dictBin[rule.compare]) == match ) {
+                        dict[digit] = rule.digit;
+                        dictBin[rule.digit] = digitBin;
+                    } else if( rule.else ) {
+                        dict[digit] = rule.else;
+                        dictBin[rule.else] = digitBin;
+                    }
+                }
+            });
+        } );
 
         return count + Number( output.map( digit => dict[digit] ).join('') );
 
