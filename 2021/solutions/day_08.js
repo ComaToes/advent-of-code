@@ -28,39 +28,23 @@ function part2(data) {
         );
 
         const digitRules = [
+            { digit: 1, length: 2 },
+            { digit: 4, length: 4 },
+            { digit: 7, length: 3 },
+            { digit: 8, length: 7 },
             { digit: 3, length: 5, compare: 1 },
             { digit: 9, length: 6, compare: 3 },
             { digit: 5, length: 5, compare: 9, matchSelf: true, else: 2 },
             { digit: 0, length: 6, compare: 1, else: 6 },
         ];
 
-        // 1, 4, 7, 8 by length
-        all.forEach( ([digit, digitBin]) => {
-            if( dict[digit] )
-                return;
-            let value = false;
-            switch( digit.length ) {
-                case 2: value = 1; break;
-                case 3: value = 7; break;
-                case 4: value = 4; break;
-                case 7: value = 8; break;
-            }
-            if( value ) {
-                dict[digit] = value;
-                dict[value] = digit;
-                dictBin[digitBin] = value;
-                dictBin[value] = digitBin;
-            }
-        });
-
-        // Other digits by rules
         digitRules.forEach( rule => {
-            all.forEach( ([digit, digitBin]) => {
+            all.some( ([digit, digitBin]) => {
                 if( dict[digit] )
-                    return;
+                    return false;
                 const match = rule.matchSelf ? digitBin : dictBin[rule.compare];
                 if( digit.length == rule.length ) {
-                    if ( (digitBin & dictBin[rule.compare]) == match ) {
+                    if ( !rule.compare || (digitBin & dictBin[rule.compare]) == match ) {
                         dict[digit] = rule.digit;
                         dictBin[rule.digit] = digitBin;
                     } else if( rule.else ) {
