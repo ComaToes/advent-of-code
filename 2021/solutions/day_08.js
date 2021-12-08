@@ -34,22 +34,22 @@ function part2(data) {
             { digit: 8, length: 7 },
             { digit: 3, length: 5, compare: 1 },
             { digit: 9, length: 6, compare: 3 },
-            { digit: 5, length: 5, compare: 9, matchSelf: true, else: 2 },
-            { digit: 0, length: 6, compare: 1, else: 6 },
+            { digit: 5, length: 5, compare: 9, matchSelf: true},
+            { digit: 2, length: 5 },
+            { digit: 0, length: 6, compare: 1 },
+            { digit: 6, length: 6 },
         ];
 
         digitRules.forEach( rule => {
             all.some( ([digit, digitBin]) => {
-                if( dict[digit] )
-                    return false;
+                if( dict[digit] !== undefined )
+                    return;
                 const match = rule.matchSelf ? digitBin : dictBin[rule.compare];
                 if( digit.length == rule.length ) {
                     if ( !rule.compare || (digitBin & dictBin[rule.compare]) == match ) {
                         dict[digit] = rule.digit;
                         dictBin[rule.digit] = digitBin;
-                    } else if( rule.else ) {
-                        dict[digit] = rule.else;
-                        dictBin[rule.else] = digitBin;
+                        return true;
                     }
                 }
             });
