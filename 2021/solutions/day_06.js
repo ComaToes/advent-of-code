@@ -10,9 +10,11 @@ function breedTheFishes(data, duration) {
 
     const spawn = [0, 0];
     for( let time = 0; time < duration; time++ ) {
-        let i = time % pop.length;
-        spawn.push( pop[i] );
-        pop[i] += spawn.shift();
+        const i = time % pop.length;
+        const j = time % spawn.length;
+        const matured = spawn[j];
+        spawn[j] = pop[i];
+        pop[i] += matured;
     }
 
     return pop.concat(spawn).reduce( (count, p) => count + p, 0 );
