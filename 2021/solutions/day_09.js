@@ -32,23 +32,11 @@ function findLows(grid) {
 
 }
 
-function part1(data) {
+function findBasins(grid) {
 
-    const grid = data.split(/\r?\n/).map( line => line.split("").map(Number) );
+    const lows = findLows(grid);
 
-    lows = findLows(grid);
-
-    return lows.reduce( (count, [y, x]) => count + grid[y][x] + 1, 0 );
-
-}
-
-function part2(data) {
-
-    const grid = data.split(/\r?\n/).map( line => line.split("").map(Number) );
-
-    lows = findLows(grid);
-
-    const basins = lows.map( (start) => {
+    return lows.map( (start) => {
 
         const basin = {};
         const toExplore = [start];
@@ -78,11 +66,30 @@ function part2(data) {
             }
 
             explored[i] = true;
+
         }
 
         return Object.keys(basin);
 
     } );
+
+}
+
+function part1(data) {
+
+    const grid = data.split(/\r?\n/).map( line => line.split("").map(Number) );
+
+    const lows = findLows(grid);
+
+    return lows.reduce( (count, [y, x]) => count + grid[y][x] + 1, 0 );
+
+}
+
+function part2(data) {
+
+    const grid = data.split(/\r?\n/).map( line => line.split("").map(Number) );
+
+    const basins = findBasins(grid);
 
     const topThree = basins.map( basin => basin.length ).sort( (a, b) => b - a ).slice(0, 3);
 
