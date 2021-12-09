@@ -2,7 +2,7 @@ function part1(data) {
 
     const lines = data.split(/\r?\n/);
 
-    const items = lines.map( line => line.split(" | ") ).map( ([input,output]) => [input.split(" "), output.split(" ")] );
+    const items = lines.map( line => line.split(" | ") ).map( arr => arr.map( str => str.split(" ") ) );
 
     const outputLengths = items.map( ([input,output]) => output.map( v => v.length ) ).flat();
     
@@ -10,14 +10,19 @@ function part1(data) {
 
 }
 
+// Alphabet used in data strings
+const alphabet = "abcdefg".split("");
+
+// Bit positions are determined by character position in alphabet
+function digitStringToBin(str) {
+    return alphabet.reduce( (value, char, i) => value + (str.indexOf(char) >= 0 ? 1 << i : 0), 0 );
+}
+
 function part2(data) {
 
-    // Parse input into [[input, output]] where these are two arrays of strings which have had their characters sorted
+    // Parse data into [[input, output]] where these are two arrays of strings
     const lines = data.split(/\r?\n/);
-    const items = lines.map( line => line.split(" | ") ).map( arr => arr.map( str => str.split(" ").map( str => str.split("").sort().join("") ) ) );
-
-    // Alphabet used in data strings
-    const alphabet = "abcdefg".split("");
+    const items = lines.map( line => line.split(" | ") ).map( arr => arr.map( str => str.split(" ") ) );
 
     // Rules used to determine a digit translation. Must be applied in order.
     // A rule identifies the candidate as `digit` if:
@@ -40,41 +45,41 @@ function part2(data) {
     ];
 
     // Combine the result for each line with a reducer
-    return items.reduce( (count, [input, output]) => {
+    return items.reduce( (count, [signals, output]) => {
 
-        // Dictionary of digit string => digit int
+        // Dictionary of binary translation of digit string => digit int
         const dict = {};
         // Dictionary of digit int => binary translation of digit string
         const dictBin = {};
 
         // Pair each digit string with a binary representation
-        // Bit positions are determined by character position in alphabet
-        const inputWithBin = input.map( digitStr => 
-            [ digitStr, 
-                alphabet.reduce( (value, char, i) => value + (digitStr.indexOf(char) >= 0 ? 1 << i : 0), 0 ) 
-            ]
+        const signalsWithBin = signals.map( str => 
+            ({ 
+                str, 
+                bin: digitStringToBin(str)
+            })
         );
 
         digitRules.forEach( rule => {
 
             // Search input for a digit which obeys the rule
-            inputWithBin.some( ([digitStr, digitBin]) => {
+            signalsWithBin.some( ({str, bin}) => {
 
                 // Skip if we have already defined this digit
-                if( dict[digitStr] !== undefined )
+                if( dict[bin] !== undefined )
                     return;
 
                 // Compare by length first
-                if( digitStr.length == rule.length ) {
+                if( str.length == rule.length ) {
 
                     // Determine what to match against
-                    const match = rule.matchSelf ? digitBin : dictBin[rule.compare];
+                    const match = rule.matchSelf ? bin : dictBin[rule.compare];
 
                     // Compare via a bitwise AND of the binary translations
-                    if ( !rule.compare || (digitBin & dictBin[rule.compare]) == match ) {
+                    if ( !rule.compare || (bin & dictBin[rule.compare]) == match ) {
 
-                        dict[digitStr] = rule.digit;
-                        dictBin[rule.digit] = digitBin;
+                        dict[bin] = rule.digit;
+                        dictBin[rule.digit] = bin;
 
                         // Break out of some()
                         return true;
@@ -87,7 +92,7 @@ function part2(data) {
         } );
 
         // Use the dictionary to translate the output, join as string and convert to number
-        return count + Number( output.map( digit => dict[digit] ).join('') );
+        return count + Number( output.map( digitStringToBin ).map( digit => dict[digit] ).join('') );
 
     }, 0 );
 
