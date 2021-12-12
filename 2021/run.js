@@ -11,11 +11,16 @@ function runDay(day, mode) {
 
     const data = fs.readFileSync(`input/${moduleName}_${mode}`).toString();
 
-    console.log("Part 1");
-    console.log( dayModule.part1(data) );
+    console.time("Part 1")
+    const part1 = dayModule.part1(data);
+    console.timeEnd("Part 1");
+    console.log( part1 );
     console.log();
-    console.log("Part 2");
-    console.log( dayModule.part2(data) );
+
+    console.time("Part 2")
+    const part2 = dayModule.part2(data);
+    console.timeEnd("Part 2");
+    console.log( part2 );
     console.log();
 
 }
