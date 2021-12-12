@@ -67,7 +67,7 @@ function part2(data) {
 
     while( paths.length > 0 ) {
 
-        const path = paths.shift();
+        const path = paths.pop();
 
         const cave = path[path.length - 1];
 
