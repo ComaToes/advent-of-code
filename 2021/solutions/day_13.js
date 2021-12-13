@@ -38,18 +38,18 @@ function foldThePaper(coords, folds) {
 
             const xofs = BigInt(maxX - position);
             maxX = position - 1;
-            const leftCols = rows.map( row => row >> (xofs + 1n) );
-            const rightCols = rows.map( row => row & ((1n << (xofs+1n))-1n) );
+            const leftRow = rows.map( row => row >> (xofs + 1n) );
+            const rightRows = rows.map( row => row & ((1n << (xofs+1n))-1n) );
             const pad = Number(xofs);
-            const reversedRight = rightCols.map( row => BigInt( "0b" + row.toString(2).padStart(pad, "0").split("").reverse().join("") ) );
-            const ofs = leftCols.length - rightCols.length;
+            const reversedRight = rightRows.map( row => BigInt( "0b" + row.toString(2).padStart(pad, "0").split("").reverse().join("") ) );
+            const ofs = leftRow.length - rightRows.length;
             for( let x = 0; x < reversedRight.length; x++ ) {
-                leftCols[x+ofs] |= reversedRight[x];
+                leftRow[x+ofs] |= reversedRight[x];
             }
-            rows = leftCols;
+            rows = leftRow;
 
         }
-
+        
     } );
 
     return rows;
@@ -81,12 +81,43 @@ function foldThePaperSensible(coords, folds) {
 
         } else {
 
-            const [leftCols, rightCols] = unzip( grid.map( row => [row.slice(0, position), row.slice(position+1)] ) );
-            const reversedRight = rightCols.map( row => row.reverse() );
-            grid = zip(leftCols, reversedRight).map( ([a,b]) => a.map( (v,i) => v || b[i]) );
+            const [leftRows, rightRows] = unzip( grid.map( row => [row.slice(0, position), row.slice(position+1)] ) );
+            const reversedRight = rightRows.map( row => row.reverse() );
+            grid = zip(leftRows, reversedRight).map( ([a,b]) => a.map( (v,i) => v || b[i]) );
 
         }
 
+    } );
+
+    return grid;
+
+}
+
+// Turns out this is much better
+function foldThePaperWithoutAStupidGrid(coords, folds) {
+
+    folds.forEach( ({axis, position}) => {
+
+        coords = coords.map( ([x, y]) => {
+
+            if( axis == "y" ) {
+                if( y > position )
+                    return [x, position-(y-position)]
+            } else if( x > position )
+                return [position-(x-position), y]
+
+            return [x, y];
+            
+        } );
+
+    });
+
+    let [maxX, maxY] = coords.reduce( ([maxX, maxY], [x, y]) => [Math.max(maxX, x), Math.max(maxY, y)], [0, 0] );
+
+    let grid = Array(maxY + 1).fill(false).map( () => Array(maxX + 1).fill(false) );
+
+    coords.forEach( ([x, y]) => {
+        grid[y][x] = true;
     } );
 
     return grid;
@@ -97,10 +128,10 @@ function part1(data) {
 
     const [coords, folds] = parseData(data);
 
-    const rows = foldThePaper(coords, [folds[0]]);
+    const rows = foldThePaperWithoutAStupidGrid(coords, [folds[0]]);
 
-    // For the Sensible implementation
-    //return rows.reduce( (count, row) => count + row.reduce( (count, cell) => count + (cell ? 1 : 0), 0 ), 0 );
+    // For the Sensible/non-grid implementations
+    return rows.reduce( (count, row) => count + row.reduce( (count, cell) => count + (cell ? 1 : 0), 0 ), 0 );
 
     return rows.reduce( (count, row) => count + row.toString(2).split("").filter( bit => bit == "1" ).length, 0 );
 
@@ -110,10 +141,10 @@ function part2(data) {
 
     const [coords, folds] = parseData(data);
 
-    const rows = foldThePaper(coords, folds);
+    const rows = foldThePaperWithoutAStupidGrid(coords, folds);
 
-    // For the Sensible implementation
-    //return rows.map( row => row.map( cell => cell ? "#" : "." ).join("") ).join("\n");;
+    // For the Sensible/non-grid implementations
+    return rows.map( row => row.map( cell => cell ? "#" : "." ).join("") ).join("\n");;
 
     return rows.map( row => row.toString(2).replace(/1/g,"#").replace(/0/g,".") ).join("\n");
 
