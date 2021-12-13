@@ -10,6 +10,7 @@ function parseData(data) {
 
 }
 
+// Considering each row as a binary value is fast for y folds, but bit reversal for x folds is messy
 function foldThePaper(coords, folds) {
 
     let [maxX, maxY] = coords.reduce( ([maxX, maxY], [x, y]) => [Math.max(maxX, x), Math.max(maxY, y)], [0, 0] );
@@ -55,11 +56,51 @@ function foldThePaper(coords, folds) {
 
 }
 
+const zip = (a,b) => a.map( (x,i) => [x, b[i]] );
+const unzip = (arr) => arr.reduce( ([a,b], [c,d]) => [[...a, c], [...b,d]], [[],[]] );
+
+// A more sensible, but slower implementation - grid of bools
+function foldThePaperSensible(coords, folds) {
+
+    let [maxX, maxY] = coords.reduce( ([maxX, maxY], [x, y]) => [Math.max(maxX, x), Math.max(maxY, y)], [0, 0] );
+
+    let grid = Array(maxY + 1).fill(false).map( () => Array(maxX + 1).fill(false) );
+
+    coords.forEach( ([x, y]) => {
+        grid[y][x] = true;
+    } );
+
+    folds.forEach( ({axis, position}) => {
+
+        if( axis == "y" ) {
+
+            const topRows = grid.slice(0, position);
+            const bottomRows = grid.slice(position+1);
+            const reversedBottom = bottomRows.reverse();
+            grid = zip(topRows, reversedBottom).map( ([a,b]) => a.map( (v,i) => v || b[i]) );
+
+        } else {
+
+            const [leftCols, rightCols] = unzip( grid.map( row => [row.slice(0, position), row.slice(position+1)] ) );
+            const reversedRight = rightCols.map( row => row.reverse() );
+            grid = zip(leftCols, reversedRight).map( ([a,b]) => a.map( (v,i) => v || b[i]) );
+
+        }
+
+    } );
+
+    return grid;
+
+}
+
 function part1(data) {
 
     const [coords, folds] = parseData(data);
 
     const rows = foldThePaper(coords, [folds[0]]);
+
+    // For the Sensible implementation
+    //return rows.reduce( (count, row) => count + row.reduce( (count, cell) => count + (cell ? 1 : 0), 0 ), 0 );
 
     return rows.reduce( (count, row) => count + row.toString(2).split("").filter( bit => bit == "1" ).length, 0 );
 
@@ -70,6 +111,9 @@ function part2(data) {
     const [coords, folds] = parseData(data);
 
     const rows = foldThePaper(coords, folds);
+
+    // For the Sensible implementation
+    //return rows.map( row => row.map( cell => cell ? "#" : "." ).join("") ).join("\n");;
 
     return rows.map( row => row.toString(2).replace(/1/g,"#").replace(/0/g,".") ).join("\n");
 
