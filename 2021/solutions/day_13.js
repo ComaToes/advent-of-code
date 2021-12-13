@@ -13,12 +13,11 @@ function parseData(data) {
 function foldThePaper(coords, folds) {
 
     let [maxX, maxY] = coords.reduce( ([maxX, maxY], [x, y]) => [Math.max(maxX, x), Math.max(maxY, y)], [0, 0] );
-    maxX = BigInt(maxX);
 
     let rows = Array(maxY + 1).fill(0n);
 
     coords.forEach( ([x, y]) => {
-        rows[y] |= 1n << (maxX - BigInt(x));
+        rows[y] |= 1n << BigInt(maxX - x);
     } );
 
     folds.forEach( ({axis, position}) => {
@@ -36,8 +35,8 @@ function foldThePaper(coords, folds) {
 
         } else {
 
-            const xofs = maxX - BigInt(position);
-            maxX = BigInt(position - 1);
+            const xofs = BigInt(maxX - position);
+            maxX = position - 1;
             const leftCols = rows.map( row => row >> (xofs + 1n) );
             const rightCols = rows.map( row => row & ((1n << (xofs+1n))-1n) );
             const pad = Number(xofs);
