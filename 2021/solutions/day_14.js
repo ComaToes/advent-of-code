@@ -160,11 +160,51 @@ function growChainGraph(template, rules, steps) {
     return counts;
 }
 
+// Had to get some hints for this
+function growChainFast(template, rules, steps) {
+
+    const chain = template.split("");
+    let counts = {};
+
+    for( let i = 0; i < chain.length - 1; i++ ) {
+        const pair = chain[i] + chain[i+1];
+        counts[pair] = (counts[pair] || 0) + 1;
+    }
+
+    for( let step = 0; step < steps; step++ ) {
+        const nextCounts = {};
+        Object.keys(counts).forEach( pair => {
+            const ch = rules[pair];
+            const [left, right] = pair.split("");
+            const leftPair = left+ch;
+            const rightPair = ch+right;
+            nextCounts[leftPair] = (nextCounts[leftPair] || 0) + counts[pair];
+            nextCounts[rightPair] = (nextCounts[rightPair] || 0) + counts[pair];
+        });
+        counts = nextCounts;
+    }
+
+    const charCounts = {};
+    Object.keys(counts).forEach( pair => {
+        const chars = pair.split("");
+        chars.forEach( ch => {
+            charCounts[ch] = (charCounts[ch] || 0) + counts[pair];
+        });
+    });
+
+    Object.keys(charCounts).forEach( ch => {
+        charCounts[ch] = Math.ceil( charCounts[ch] / 2 );
+    });
+
+    return charCounts;
+
+}
+
 function part2(data) {
 
     const [template, rules] = parseData(data);
 
-    const counts = growChainGraph(template, rules, 20);
+    const counts = growChainFast(template, rules, 40);
 
     const [min, max] = Object.keys(counts).reduce( 
         ([min, max], ch) => [ Math.min(min, counts[ch]), Math.max( max, counts[ch]) ], 
