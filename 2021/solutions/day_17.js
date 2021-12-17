@@ -1,18 +1,31 @@
+// Sum of the first x values in an arithmetic sequence starting at 1 with an increment of 1
 const arithSum = (x) => x / 2 * (x + 1);
+// Inverse of above
 const arithSumInv = (x) => ( Math.sqrt( 8 * x + 1 ) - 1 ) / 2;
-
+// Calculate the time at which a projectile with initial (1d) velocity v passes distance x
+// This is intersecting a line and parabola, so the sign allows us to choose which intersection point to use
 const calcT = (v, x, sign = 1) => ( sign * Math.sqrt( 4*v*v + 4*v - 8*x + 1 ) + 2*v + 1 ) / 2;
 
+/*
+    General approach is to find the time windows (Tmin - Tmax) that any valid vx or vy
+    will be within the target x or y range. Then intersect these to find the vx,vy combinations
+    that hit the target box.
+*/
 function doTheMath(target) {
 
+    // Inverse function lets us find the min initial vx that doesn't fall off before the target
     const minVx = Math.ceil( arithSumInv( target.xmin ) );
     const maxVx = target.xmax;
 
+    // minVx <= vx <= maxVxDrop will fall to infinity within the target x range
     const maxVxDrop = Math.floor( arithSumInv( target.xmax ) );
 
+    // These were reverse-engineered from the output when trialling with a wide vy range
+    // There's probably a reason for them to have these values
     const maxVy = Math.abs( target.ymin );
     const minVy = target.ymin;
 
+    // Find time windows for all vx that have an integer result in the target x range
     const vxRanges = [];
 
     for( let vx = minVx; vx <= maxVx; vx++ ) {
@@ -29,6 +42,7 @@ function doTheMath(target) {
 
     }
 
+    // Find time windows for all vy that have an integer result in the target y range
     const vyRanges = [];
 
     for( let vy = minVy; vy <= maxVy; vy++ ) {
@@ -41,6 +55,7 @@ function doTheMath(target) {
 
     }
 
+    // Intersect vx and vy ranges to find valid vx,vy solutions
     let maxValidVy = 0;
     let count = 0;
 
