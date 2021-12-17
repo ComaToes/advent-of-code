@@ -19,6 +19,8 @@ function doTheMath(target) {
     let maxY = 0;
     let count = 0;
 
+    const vxRanges = [];
+
     for( let vx = minVx; vx <= maxVx; vx++ ) {
 
         const xTmin = Math.ceil( calcT( vx, target.xmin, -1 ) );
@@ -28,10 +30,26 @@ function doTheMath(target) {
         else
             xTmax = Math.floor( calcT( vx, target.xmax, -1 ) );
 
-        for( let vy = minVy; vy < maxVy; vy++ ) {
+        if( xTmin <= xTmax )
+            vxRanges.push( [vx, xTmin, xTmax] );
 
-            const yTmin = Math.ceil( calcT( vy, target.ymax ) );
-            const yTmax = Math.floor( calcT( vy, target.ymin ) );
+    }
+
+    const vyRanges = [];
+
+    for( let vy = minVy; vy < maxVy; vy++ ) {
+
+        const yTmin = Math.ceil( calcT( vy, target.ymax ) );
+        const yTmax = Math.floor( calcT( vy, target.ymin ) );
+
+        if( yTmin <= yTmax )
+            vyRanges.push( [vy, yTmin, yTmax] );
+
+    }
+
+    vxRanges.forEach( ([vx, xTmin, xTmax]) => {
+
+        vyRanges.forEach( ([vy, yTmin, yTmax]) => {
 
             const dTmin = Math.max( xTmin, yTmin );
             const dTmax = Math.min( xTmax, yTmax );
@@ -42,9 +60,9 @@ function doTheMath(target) {
                 count++;
             }
 
-        }
+        } );
 
-    }
+    } )
 
     return { maxY, count };
 
