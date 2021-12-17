@@ -1,23 +1,17 @@
 const arithSum = (x) => x / 2 * (x + 1);
+const arithSumInv = (x) => ( Math.sqrt( 8 * x + 1 ) - 1 ) / 2;
 
 const calcT = (v, x, sign = 1) => ( sign * Math.sqrt( 4*v*v + 4*v - 8*x + 1 ) + 2*v + 1 ) / 2;
 
 function doTheMath(target) {
 
-    let minVx = 1;
-    while( arithSum(minVx) < target.xmin )
-        minVx++;
+    const minVx = Math.ceil( arithSumInv( target.xmin + 1 ) );
     const maxVx = target.xmax;
 
-    let maxVxDrop = minVx;
-    while( arithSum(maxVxDrop) < target.xmax )
-        maxVxDrop++;
+    const maxVxDrop = Math.floor( arithSumInv( target.xmax ) );
 
     const maxVy = Math.abs( target.ymin );
     const minVy = target.ymin;
-
-    let maxY = 0;
-    let count = 0;
 
     const vxRanges = [];
 
@@ -25,7 +19,7 @@ function doTheMath(target) {
 
         const xTmin = Math.ceil( calcT( vx, target.xmin, -1 ) );
         let xTmax;
-        if( vx < maxVxDrop )
+        if( vx <= maxVxDrop )
             xTmax = Infinity;
         else
             xTmax = Math.floor( calcT( vx, target.xmax, -1 ) );
@@ -46,6 +40,9 @@ function doTheMath(target) {
             vyRanges.push( [vy, yTmin, yTmax] );
 
     }
+
+    let maxY = 0;
+    let count = 0;
 
     vxRanges.forEach( ([vx, xTmin, xTmax]) => {
 
