@@ -31,7 +31,7 @@ function doTheMath(target) {
 
     const vyRanges = [];
 
-    for( let vy = minVy; vy < maxVy; vy++ ) {
+    for( let vy = minVy; vy <= maxVy; vy++ ) {
 
         const yTmin = Math.ceil( calcT( vy, target.ymax ) );
         const yTmax = Math.floor( calcT( vy, target.ymin ) );
