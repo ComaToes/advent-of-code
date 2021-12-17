@@ -5,7 +5,7 @@ const calcT = (v, x, sign = 1) => ( sign * Math.sqrt( 4*v*v + 4*v - 8*x + 1 ) + 
 
 function doTheMath(target) {
 
-    const minVx = Math.ceil( arithSumInv( target.xmin + 1 ) );
+    const minVx = Math.ceil( arithSumInv( target.xmin ) );
     const maxVx = target.xmax;
 
     const maxVxDrop = Math.floor( arithSumInv( target.xmax ) );
