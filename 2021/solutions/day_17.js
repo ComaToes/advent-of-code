@@ -41,7 +41,7 @@ function doTheMath(target) {
 
     }
 
-    let maxY = 0;
+    let maxValidVy = 0;
     let count = 0;
 
     vxRanges.forEach( ([vx, xTmin, xTmax]) => {
@@ -52,14 +52,15 @@ function doTheMath(target) {
             const dTmax = Math.min( xTmax, yTmax );
 
             if( dTmin <= dTmax ) {
-                const thisMaxY = arithSum(vy);
-                maxY = Math.max(thisMaxY, maxY);
+                maxValidVy = Math.max( maxValidVy, vy );
                 count++;
             }
 
         } );
 
-    } )
+    } );
+
+    const maxY = arithSum( maxValidVy );
 
     return { maxY, count };
 
