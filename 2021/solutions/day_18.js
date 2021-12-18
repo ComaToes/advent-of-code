@@ -26,19 +26,20 @@ function walkDown(tree, fn) {
 }
 
 function walkLtR(root, fn) {
-    const s = [];
+    const stack = [];
     let node = root;
 
-    while( node instanceof Object || s.length > 0 ) {
+    while( node instanceof Object || stack.length > 0 ) {
 
         while( node instanceof Object ) {
-            s.push(node);
+            stack.push(node);
             node = node.left;
         }
-        node = s.pop();
+        node = stack.pop();
         
         if( !(node.left instanceof Object) || !(node.right instanceof Object) )
-            fn( node );
+            if( fn( node ) )
+                break;
 
         node = node.right;
 
@@ -46,10 +47,12 @@ function walkLtR(root, fn) {
 
 }
 
-function findLeftNeighbor(node, fn) {
+function findNeighbor(node, direction, fn) {
+
+    const otherDirection = direction == "left" ? "right" : "left";
 
     // Go up until we can go left
-    while( node.parent && node.parent.left == node )
+    while( node.parent && node.parent[direction] == node )
         node = node.parent;
     if( !node.parent )
         return;
@@ -57,46 +60,19 @@ function findLeftNeighbor(node, fn) {
     node = node.parent;
 
     // cater for a left that is a number
-    if( !(node.left instanceof Object) ) {
-        node.left = fn(node.left);
+    if( !(node[direction] instanceof Object) ) {
+        node[direction] = fn(node[direction]);
         return;
     }
 
     // If an object follow it down
-    node = node.left;
+    node = node[direction];
     
     // Go down as far right as possible
-    while( node.right instanceof Object )
-        node = node.right;
+    while( node[otherDirection] instanceof Object )
+        node = node[otherDirection];
 
-    node.right = fn(node.right);
-
-}
-
-function findRightNeighbor(node, fn) {
-
-    // Go up until we can go right
-    while( node.parent && node.parent.right == node )
-        node = node.parent;
-    if( !node.parent )
-        return;
-
-    node = node.parent;
-
-    // cater for a right that is a number
-    if( !(node.right instanceof Object) ) {
-        node.right = fn(node.right);
-        return;
-    }
-
-    // If an object follow it down
-    node = node.right;
-    
-    // Go down as far left as possible
-    while( node.left instanceof Object )
-        node = node.left;
-
-    node.left = fn(node.left);
+    node[otherDirection] = fn(node[otherDirection]);
 
 }
 
@@ -108,74 +84,57 @@ function printTree(node) {
     return `[${left},${right}]`;
 }
 
-function findExplosions(root) {
+function findExplosion(root) {
 
-    const exploders = [];
+    let node;
     walkLtR(root, n => {
-        if( n.depth >= 4 )
-            exploders.push(n);
-    });
-    exploders.some( node => {
-
-        if( node.left instanceof Object || node.right instanceof Object )
-            return;
-
-        findLeftNeighbor(node, n => n + node.left);
-        findRightNeighbor(node, n => n + node.right);
-
-        if( node == node.parent.left )
-            node.parent.left = 0;
-        if( node == node.parent.right )
-            node.parent.right = 0;
-
-        return true;
-
+        if( n.depth >= 4 && !(n.left instanceof Object) && !(n.right instanceof Object) ) {
+            node = n;
+            return true;
+        }
     });
 
-    return exploders.length;
+    if( !node )
+        return false;
+
+    findNeighbor(node, "left", n => n + node.left);
+    findNeighbor(node, "right", n => n + node.right);
+
+    if( node == node.parent.left )
+        node.parent.left = 0;
+    else
+        node.parent.right = 0;
+
+    return true;
 
 }
 
-function findSplits(root) {
+function findSplit(root) {
 
-    let splits = [];
+    let node;
     walkLtR(root, n => {
-        if( n.left >= 10 || n.right >= 10 )
-            splits.push(n);
+        if( n.left >= 10 || n.right >= 10 ) {
+            node = n;
+            return true;
+        }
     });
-    splits.some( node => {
 
-        if( node.left >= 10 ) {
-            const left = Math.floor(node.left/2);
-            const right = Math.ceil(node.left/2);
-            const child = {
-                left,
-                right,
-                parent: node,
-                depth: node.depth+1
-            };
-            node.left = child;
-            return true;
-        }
+    if( !node )
+        return false;
 
-        if( node.right >= 10 ) {
-            const left = Math.floor(node.right/2);
-            const right = Math.ceil(node.right/2);
-            const child = {
-                left,
-                right,
-                parent: node,
-                depth: node.depth+1
-            };
-            node.right = child;
-            return true;
-        }
+    const splitSide = node.left >= 10 ? "left" : "right";
 
-        return true;
-        
-    } );
+    const left = Math.floor(node[splitSide]/2);
+    const right = Math.ceil(node[splitSide]/2);
+    const child = {
+        left,
+        right,
+        parent: node,
+        depth: node.depth+1
+    };
+    node[splitSide] = child;
 
-    return splits.length;
+    return true;
 
 }
 
@@ -184,23 +143,24 @@ function addSnailNumbers(items) {
     let root = arrToTree( items.shift(), 0 );
 
     while( items.length > 0 ) {
-        // Add next item
+
         const next = arrToTree( items.shift(), 1 );
+        
         walkDown( root, n => n.depth++ );
+
         const newRoot = {
             left: root,
             right: next,
             depth: 0
         }
+        
         root.parent = newRoot;
         next.parent = newRoot;
         root = newRoot;
 
-        let count;
         do {
-            while( findExplosions(root) > 0 ) {}
-            count = findSplits(root);
-        } while( count > 0 );
+            while( findExplosion(root) ) {}
+        } while( findSplit(root) );
             
     }
 
