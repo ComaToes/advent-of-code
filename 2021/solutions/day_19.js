@@ -43,7 +43,7 @@ function fixCoords(scanners) {
         }) )
     }) );
 
-    const startId = 1;
+    const startId = 0;
     scanners[startId].fixed = [0,0,0];
     scanners[startId].beacons.forEach( b => b.fixed = b.coords );
 
@@ -72,10 +72,15 @@ function fixCoords(scanners) {
 
             if( pairs.length == 12 ) {
 
-                console.log( `${scanner.id}--${other.id}`);
-                const [[a1,b1],[a2,b2]] = pairs;
+                // This sidesteps an issue when two dimensions have the same distance
+                let a1, b1, a2 ,b2, aDist;
+                do {
+                    [a1,b1] = pairs.shift();
+                    [a2,b2] = pairs.shift();
+                    aDist = arrDist(a1.fixed, a2.fixed);
+                } while( (Math.abs(aDist[0]) == Math.abs(aDist[1])) || (Math.abs(aDist[0]) == Math.abs(aDist[2])) || (Math.abs(aDist[1]) == Math.abs(aDist[2])) );
 
-                const mapping = findMapping( arrDist(a1.fixed, a2.fixed), arrDist(b1.coords, b2.coords) );
+                const mapping = findMapping( aDist, arrDist(b1.coords, b2.coords) );
 
                 other.fixed = mapping.map( ({index, sign}, i) => a1.fixed[i] - b1.coords[index] * sign );
                 
@@ -103,9 +108,7 @@ function part1(data) {
 
     const beaconSet = {};
 
-    scanners.forEach( ({id, fixed, beacons}) => {
-        console.log(id)
-        console.log(fixed)
+    scanners.forEach( ({beacons}) => {
         beacons.forEach( beacon => {
             const uid = beacon.fixed.join(",");
             beaconSet[uid] = beacon;
