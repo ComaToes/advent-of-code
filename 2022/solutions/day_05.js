@@ -3,9 +3,9 @@ function parseData(data) {
     const [rawState, rawMoves] = data.split(/\r?\n\r?\n/)
 
     const stateLines = rawState.split(/\r?\n/)
-    const stackCount = (stateLines.pop().trim().length + 3) / 4
+    const stackCount = (stateLines.pop().length + 1) / 4
 
-    const stacks = [...Array(stackCount).keys()].map( () => [] )
+    const stacks = Array(stackCount).fill().map( () => [] )
 
     stateLines.forEach( line => {
         for (let i = 0; i < stackCount; i++) {
@@ -29,8 +29,8 @@ function part1(data) {
     const {stacks, moves} = parseData(data)
 
     moves.forEach( ({count, from, to}) => {
-        const elems = stacks[from-1].splice( -count, count )
-        stacks[to-1].push(...(elems.reverse()))
+        const elems = stacks[from-1].splice( -count, count ).reverse()
+        stacks[to-1].push(...elems)
     })
 
     return stacks.map( s => s.pop() ).join('')
