@@ -27,7 +27,7 @@ function findMarker(encoded, markerLength) {
 
     }
 
-    return Number(end)
+    return end
 
 }
 
