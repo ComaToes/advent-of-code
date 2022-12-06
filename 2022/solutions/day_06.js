@@ -8,13 +8,13 @@ function encodeString(str) {
 function findMarker(encoded, markerLength) {
 
     let product = 1n
-    let start = 0n
-    let end = 0n
+    let start = 0
+    let end = 0
 
     while( end < encoded.length ) {
 
         // enlarge window to right
-        while( end - start < markerLength && product % encoded[end] > 0 )
+        while( end - start < markerLength && product % encoded[end] > 0n )
             product *= encoded[end++]
 
         // marker found
@@ -22,7 +22,7 @@ function findMarker(encoded, markerLength) {
             break;
 
         // shrink window from left
-        while( start <= end && product % encoded[end] == 0 )
+        while( start <= end && product % encoded[end] == 0n )
             product /= encoded[start++]
 
     }
