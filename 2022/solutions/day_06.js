@@ -19,7 +19,7 @@ function findMarker(encoded, markerLength) {
 
         // marker found
         if( end - start == markerLength )
-            break;
+            break
 
         // shrink window from left
         while( start <= end && product % encoded[end] == 0n )
