@@ -43,19 +43,14 @@ function part1(data) {
 }
 
 function getViewsAlong(arr) {
-    let work = []
     let res = Array(arr.length).fill(0)
-    arr.forEach( (height, j) => {
-        work = work.filter( w => {
-            if( w.height <= height ) {
-                res[w.j] = j - w.j
-                return false
-            }
-            return true
-        })
-        work.push({j,height})
+    arr.forEach( (height, i) => {
+        for( let j = i+1; j < arr.length; j++ ) {
+            res[i]++
+            if( arr[j] >= height )
+                break
+        }
     })
-    work.forEach( w => res[w.j] = arr.length - w.j - 1 )
     return res
 }
 
