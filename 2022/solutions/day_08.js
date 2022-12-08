@@ -1,43 +1,44 @@
+function getVisibilityAlong(arr) {
+    let max = -1
+    return arr.map( height => {
+        if( height > max ) {
+            max = height
+            return true
+        }
+        return false
+    })
+}
+
 function part1(data) {
 
-    const grid = data.split(/\r?\n/).map( row => row.split('').map(Number) )
-    const visibilityGrid = Array(grid.length).fill().map( () => Array(grid[0].length) )
+    const gridRows = data.split(/\r?\n/).map( row => row.split('').map(Number) )
+    const width = gridRows[0].length
+    const height = gridRows.length
 
-    for( let row = 0; row < grid.length; row++ ) {
-        let highest = -1
-        for( let i = 0; i < grid[row].length; i++ ) {
-            if( grid[row][i] > highest ) {
-                visibilityGrid[row][i] = true
-                highest = grid[row][i]
-            }
-        }
-        highest = -1
-        for( let i = grid[row].length-1; i >= 0 ; i-- ) {
-            if( grid[row][i] > highest ) {
-                visibilityGrid[row][i] = true
-                highest = grid[row][i]
-            }
-        }
-    }
+    const gridCols = Array(width).fill().map( () => Array(height).fill() )
+                     .map( (col, i) => col.map( (x,j) => gridRows[j][i] ) )
 
-    for( let col = 0; col < grid.length; col++ ) {
-        let highest = -1
-        for( let i = 0; i < grid[col].length; i++ ) {
-            if( grid[i][col] > highest ) {
-                visibilityGrid[i][col] = true
-                highest = grid[i][col]
-            }
-        }
-        highest = -1
-        for( let i = grid.length-1; i >= 0 ; i-- ) {
-            if( grid[i][col] > highest ) {
-                visibilityGrid[i][col] = true
-                highest = grid[i][col]
-            }
-        }
-    }
+    const horizontalVisibility = gridRows.map( row => {
 
-    return visibilityGrid.flat().length
+        const visibleFromRight = getVisibilityAlong(row)
+        const visibleFromLeft = getVisibilityAlong(row.reverse()).reverse()
+        return visibleFromRight.map( (visible,i) => visible || visibleFromLeft[i] )
+
+    })
+
+    const verticalVisiblity = gridCols.map( col => {
+
+        const visibleFromTop = getVisibilityAlong(col)
+        const visibileFromBottom = getVisibilityAlong(col.reverse()).reverse()
+        return visibleFromTop.map( (visible,i) => visible || visibileFromBottom[i] )
+
+    })
+
+    const combinedVisibility = horizontalVisibility.map( (row,i) => 
+        row.map( (value,j) => value || verticalVisiblity[j][i] ) 
+    )
+
+    return combinedVisibility.flat().filter( value => value ).length
 
 }
 
@@ -67,7 +68,7 @@ function part2(data) {
     const gridCols = Array(width).fill().map( () => Array(height).fill() )
                      .map( (col, i) => col.map( (x,j) => gridRows[j][i] ) )
 
-    const horizontalViews = gridRows.map( (row, i) => {
+    const horizontalViews = gridRows.map( row => {
 
         const viewsToRight = getViewsAlong(row)
         const viewsToLeft = getViewsAlong(row.reverse()).reverse()
@@ -75,7 +76,7 @@ function part2(data) {
 
     })
 
-    const verticalViews = gridCols.map( (col, i) => {
+    const verticalViews = gridCols.map( col => {
 
         const viewsDown = getViewsAlong(col)
         const viewsUp = getViewsAlong(col.reverse()).reverse()
