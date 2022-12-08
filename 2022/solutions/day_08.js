@@ -41,78 +41,53 @@ function part1(data) {
 
 }
 
-function multGrids(a, b) {
-    return a.map( (row, i) => row.map( (value, j) => value * b[i][j] ) )
-}
-
-function createZeroGrid(width, height) {
-    return Array(height).fill().map( () => Array(width).fill(0) )
+function getViewsAlong(arr) {
+    let work = []
+    let res = Array(arr.length).fill(0)
+    arr.forEach( (height, j) => {
+        work = work.filter( w => {
+            if( w.height <= height ) {
+                res[w.j] = j - w.j
+                return false
+            }
+            return true
+        })
+        work.push({j,height})
+    })
+    work.forEach( w => res[w.j] = arr.length - w.j - 1 )
+    return res
 }
 
 function part2(data) {
 
-    const grid = data.split(/\r?\n/).map( row => row.split('').map(Number) )
-    const width = grid[0].length
-    const height = grid.length
+    const gridRows = data.split(/\r?\n/).map( row => row.split('').map(Number) )
+    const width = gridRows[0].length
+    const height = gridRows.length
 
-    let stepGrid = createZeroGrid(width, height)
-    for( let row = 0; row < grid.length; row++ ) {
-        let work = []
-        for( let i = 0; i < grid[row].length; i++ ) {
-            const height = grid[row][i]
-            work.forEach( w => {
-                stepGrid[row][w.i]++
-            })
-            work = work.filter( ({max}) => max > height )
-            work.push({i,max: height})
-        }
-    }
-    let scoreGrid = stepGrid
+    const gridCols = Array(width).fill().map( () => Array(height).fill() )
+                     .map( (col, i) => col.map( (x,j) => gridRows[j][i] ) )
 
-    stepGrid = createZeroGrid(width, height)
-    for( let row = 0; row < grid.length; row++ ) {
-        let work = []
-        
-        for( let i = grid[row].length-1; i >= 0 ; i-- ) {
-            const height = grid[row][i]
-            work.forEach( w => {
-                stepGrid[row][w.i]++
-            })
-            work = work.filter( ({max}) => max > height )
-            work.push({i,max: height})
-        }
-    }
-    scoreGrid = multGrids(scoreGrid, stepGrid)
+    const horizontalViews = gridRows.map( (row, i) => {
 
-    stepGrid = createZeroGrid(width, height)
-    for( let col = 0; col < grid[0].length; col++ ) {
-        let work = []
-        for( let i = 0; i < grid.length; i++ ) {
-            const height = grid[i][col]
-            work.forEach( w => {
-                stepGrid[w.i][col]++
-            })
-            work = work.filter( ({max}) => max > height )
-            work.push({i,max: height})
-        }
-    }
-    scoreGrid = multGrids(scoreGrid, stepGrid)
+        const viewsToRight = getViewsAlong(row)
+        const viewsToLeft = getViewsAlong(row.reverse()).reverse()
+        return viewsToRight.map( (score,i) => score * viewsToLeft[i] )
 
-    stepGrid = createZeroGrid(width, height)
-    for( let col = 0; col < grid[0].length; col++ ) {
-        let work = []
-        for( let i = grid.length-1; i >= 0 ; i-- ) {
-            const height = grid[i][col]
-            work.forEach( w => {
-                stepGrid[w.i][col]++
-            })
-            work = work.filter( ({max}) => max > height )
-            work.push({i,max: height})
-        }
-    }
-    scoreGrid = multGrids(scoreGrid, stepGrid)
+    })
 
-    return scoreGrid.flat().reduce( (max,v) => max > v ? max : v, 0 )
+    const verticalViews = gridCols.map( (col, i) => {
+
+        const viewsDown = getViewsAlong(col)
+        const viewsUp = getViewsAlong(col.reverse()).reverse()
+        return viewsDown.map( (score,i) => score * viewsUp[i] )
+
+    })
+
+    const combinedViews = horizontalViews.map( (row,i) => 
+        row.map( (value,j) => value * verticalViews[j][i] ) 
+    )
+
+    return combinedViews.flat().reduce( (max,v) => max > v ? max : v, 0 )
 
 }
 
