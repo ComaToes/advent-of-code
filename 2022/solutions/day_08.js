@@ -43,15 +43,15 @@ function part1(data) {
 }
 
 function getViewsAlong(arr) {
-    let res = Array(arr.length).fill(0)
-    arr.forEach( (height, i) => {
+    return arr.map( (height, i) => {
+        let score = 0
         for( let j = i+1; j < arr.length; j++ ) {
-            res[i]++
+            score++
             if( arr[j] >= height )
                 break
         }
+        return score
     })
-    return res
 }
 
 function part2(data) {
