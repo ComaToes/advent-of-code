@@ -56,11 +56,9 @@ function part2(data) {
     }
 
     instructions.forEach( ({instr,value}) => {
-        plinkScreen(cycle, x)
-        cycle++
+        plinkScreen(cycle++, x)
         if( instr == "addx" ) {
-            plinkScreen(cycle, x)
-            cycle++
+            plinkScreen(cycle++, x)
             x += value
         }
     })
