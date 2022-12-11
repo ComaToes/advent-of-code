@@ -84,7 +84,7 @@ function part2(data) {
             monkey.items.forEach( item => {
 
                 divisors.forEach( divisor => {
-                    const value = useOldValue ? item[divisor] : (numRight % divisor)
+                    const value = useOldValue ? item[divisor] : numRight
                     if( isAddition )
                         item[divisor] = (item[divisor] + value) % divisor
                     else
