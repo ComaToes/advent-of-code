@@ -77,17 +77,19 @@ function part2(data) {
         monkeys.forEach( monkey => {
 
             const {op,right} = monkey.op
+            const useOldValue = right == "old"
+            const numRight = Number(right)
+            const isAddition = op == "+"
 
             monkey.items.forEach( item => {
 
-                item = divisors.reduce( (mods,divisor) => {
-                    const value = right == "old" ? item[divisor] : (Number(right) % divisor)
-                    if( op == "+" )
-                        mods[divisor] = (item[divisor] + value) % divisor
+                divisors.forEach( divisor => {
+                    const value = useOldValue ? item[divisor] : (numRight % divisor)
+                    if( isAddition )
+                        item[divisor] = (item[divisor] + value) % divisor
                     else
-                        mods[divisor] = (item[divisor] * value) % divisor
-                    return mods
-                }, {})
+                        item[divisor] = (item[divisor] * value) % divisor
+                })
 
                 if( item[monkey.test] == 0 )
                     monkeys[ monkey.pass ].items.push( item )
