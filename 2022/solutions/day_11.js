@@ -53,7 +53,6 @@ function part2(data) {
     const monkeys = data.split(/\r?\n\r?\n/).map( str => {
         const [monkeyId,itemsStr,opStr,testStr,trueStr,falseStr] = str.split(/\r?\n/)
         const items = itemsStr.match(/Starting items: (.*)/  )[1].split(", ").map(Number)
-                        .map( initialValue => ({initialValue, ops: []}))
         const op = {...opStr.match(/Operation: new = (?<left>\S+)\s(?<op>.)\s(?<right>\S+)/ ).groups}
         const test = Number( testStr.match(/Test: divisible by (.*)/  )[1] )
         const pass = Number( trueStr.match(/If true: throw to monkey (.*)/  )[1] )
@@ -62,38 +61,35 @@ function part2(data) {
     })
 
     const divisors = monkeys.map( ({test}) => test )
-    const mods = monkeys.map( monkey => {
-        const values = monkey.items.map( ({initialValue}) => initialValue )
-        if( monkey.op.right != "old" )
-            values.push( Number(monkey.op.right) )
-        return values
-    }).flat().reduce( (mods,value) => 
-        (mods[value] = divisors.reduce( (valueMods,divisor) => {
-            valueMods[divisor] = value % divisor
-            return valueMods
-        }, {} )) && mods, {} 
-    )
+
+    monkeys.forEach( monkey => {
+        monkey.items = monkey.items.map( value => {
+            return divisors.reduce( (mods,divisor) => {
+                mods[divisor] = value % divisor
+                return mods
+            }, {})
+        })
+    } )
 
     const rounds = 10000
 
     for (let i = 0; i < rounds; i++) {
         monkeys.forEach( monkey => {
 
-            const {left,op,right} = monkey.op
+            const {op,right} = monkey.op
 
             monkey.items.forEach( item => {
-                
-                const newValue = { value: right == "old" ? right : Number(right), op }
-                item.ops.push( newValue )
 
-                const worryMod = item.ops.reduce( (x,{op,value}) => {
-                    let mod = value == "old" ? x : mods[value][monkey.test]
+                item = divisors.reduce( (mods,divisor) => {
+                    const value = right == "old" ? item[divisor] : (Number(right) % divisor)
                     if( op == "+" )
-                        return (x + mod) % monkey.test
-                    return (x * mod) % monkey.test
-                }, mods[item.initialValue][monkey.test] )
+                        mods[divisor] = (item[divisor] + value) % divisor
+                    else
+                        mods[divisor] = (item[divisor] * value) % divisor
+                    return mods
+                }, {})
 
-                if( worryMod % monkey.test == 0 )
+                if( item[monkey.test] == 0 )
                     monkeys[ monkey.pass ].items.push( item )
                 else
                     monkeys[ monkey.fail ].items.push( item )
