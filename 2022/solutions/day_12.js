@@ -47,9 +47,9 @@ function aStar(start, h, found) {
         ...start,
         fScore: h(start),
         gScore: 0,
-    }];
+    }]
 
-    const cameFrom = {};
+    const cameFrom = {}
 
     let current
     while( openSet.length > 0 ) {
@@ -59,22 +59,22 @@ function aStar(start, h, found) {
         current = openSet.shift()
 
         if( found(current) )
-            break;
+            break
 
         current.edges.forEach( ({node, weight}) => {
             const t_gScore = current.gScore + weight
             if( t_gScore < node.gScore ) {
                 cameFrom[node.id] = current
-                node.gScore = t_gScore;
+                node.gScore = t_gScore
                 node.fScore = t_gScore + h(node)
                 if( !openSet.includes(node) )
-                    openSet.push(node);
+                    openSet.push(node)
             }
-        } );
+        } )
 
     }
 
-    return current.gScore;
+    return current.gScore
 
 }
 
