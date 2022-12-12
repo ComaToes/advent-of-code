@@ -80,10 +80,10 @@ function aStar(start, h, found) {
 
 function part1(data) {
 
-    const {grid,start,end} = parseGrid(data)
+    const {grid, start, end} = parseGrid(data)
 
     // Edges for valid uphill paths
-    createEdges(grid, (a,b) => (b.height - a.height) < 2 )
+    createEdges( grid, (a,b) => (b.height - a.height) < 2 )
 
     // Heuristic is manhatten distance to end
     const h = ({x,y}) => Math.abs(end.x - x) + Math.abs(end.y - y)
@@ -98,13 +98,13 @@ function part1(data) {
 
 function part2(data) {
 
-    const {grid,end} = parseGrid(data)
+    const {grid, end} = parseGrid(data)
 
     // Edges for valid downhill paths
-    createEdges(grid, (a,b) => (a.height - b.height) < 2 )
+    createEdges( grid, (a,b) => (a.height - b.height) < 2 )
 
     // Heuristic is reduction in height
-    const h = ({x,y,height}) => 25 - height
+    const h = ({height}) => 25 - height
 
     // Stop at height 0
     const found = node => node.height == 0
