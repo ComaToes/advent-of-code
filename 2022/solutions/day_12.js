@@ -103,8 +103,10 @@ function part2(data) {
     // Edges for valid downhill paths
     createEdges( grid, (a,b) => (a.height - b.height) < 2 )
 
-    // Heuristic is reduction in height
-    const h = ({height}) => 25 - height
+    // Heuristic is distance from x = 0 because all the valid starts are there
+    // Without this meta-knowledge of the input, a constant heuristic would 
+    // make this essentially a Dijkstra/BFS instead
+    const h = ({x}) => x
 
     // Stop at height 0
     const found = node => node.height == 0
