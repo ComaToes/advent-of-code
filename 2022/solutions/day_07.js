@@ -66,7 +66,7 @@ function labelDirSizes(fs) {
 
 }
 
-function part1(data) {
+export function part1(data) {
 
     const commands = parseCommands(data)
     const fs = buildFilesystem(commands)
@@ -83,7 +83,7 @@ function part1(data) {
 
 }
 
-function part2(data) {
+export function part2(data) {
 
     const commands = parseCommands(data)
     const fs = buildFilesystem(commands)
@@ -104,5 +104,3 @@ function part2(data) {
     return bestCandidate.size
 
 }
-
-module.exports = { part1, part2 }

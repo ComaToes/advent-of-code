@@ -1,4 +1,4 @@
-function part1(data) {
+export function part1(data) {
 
     const elves = data.split(/(\r?\n){2}/).map( 
         elf =>  elf.split(/\r?\n/)
@@ -10,7 +10,7 @@ function part1(data) {
 
 }
 
-function part2(data) {
+export function part2(data) {
 
     const elves = data.split(/(\r?\n){2}/).map( 
         elf =>  elf.split(/\r?\n/)
@@ -23,5 +23,3 @@ function part2(data) {
     return elves.slice(0, 3).reduce( (total, elf) => total + elf, 0 )
 
 }
-
-module.exports = { part1, part2 }

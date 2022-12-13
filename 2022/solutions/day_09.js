@@ -60,7 +60,7 @@ function moveRope(knotCount, moves) {
 
 }
 
-function part1(data) {
+export function part1(data) {
 
     const moves = parseMoves(data)
 
@@ -70,7 +70,7 @@ function part1(data) {
 
 }
 
-function part2(data) {
+export function part2(data) {
 
     const moves = parseMoves(data)
 
@@ -80,5 +80,3 @@ function part2(data) {
 
 
 }
-
-module.exports = { part1, part2 }

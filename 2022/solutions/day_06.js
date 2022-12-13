@@ -31,7 +31,7 @@ function findMarker(encoded, markerLength) {
 
 }
 
-function part1(data) {
+export function part1(data) {
 
     const encoded = encodeString(data)
 
@@ -39,12 +39,10 @@ function part1(data) {
 
 }
 
-function part2(data) {
+export function part2(data) {
 
     const encoded = encodeString(data)
 
     return findMarker(encoded, 14)
 
 }
-
-module.exports = { part1, part2 }

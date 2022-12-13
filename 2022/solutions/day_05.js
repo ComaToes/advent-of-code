@@ -24,7 +24,7 @@ function parseData(data) {
     return {stacks, moves}
 }
 
-function part1(data) {
+export function part1(data) {
 
     const {stacks, moves} = parseData(data)
 
@@ -37,7 +37,7 @@ function part1(data) {
 
 }
 
-function part2(data) {
+export function part2(data) {
 
     const {stacks, moves} = parseData(data)
 
@@ -49,5 +49,3 @@ function part2(data) {
     return stacks.map( s => s.pop() ).join('')
 
 }
-
-module.exports = { part1, part2 }

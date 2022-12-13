@@ -1,4 +1,4 @@
-function part1(data) {
+export function part1(data) {
 
     const instructions = data.split(/\r?\n/).map( str => {
         const [instr, valueStr] = str.split(/\s/)
@@ -31,7 +31,7 @@ function printScreen(screen) {
     return screen.map( row => row.join("") ).join("\n")
 }
 
-function part2(data) {
+export function part2(data) {
 
     const instructions = data.split(/\r?\n/).map( str => {
         const [instr, valueStr] = str.split(/\s/)
@@ -66,5 +66,3 @@ function part2(data) {
     return printScreen(screen)
 
 }
-
-module.exports = { part1, part2 }

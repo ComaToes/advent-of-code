@@ -1,4 +1,4 @@
-function part1(data) {
+export function part1(data) {
 
     const monkeys = data.split(/\r?\n\r?\n/).map( str => {
         const [monkeyId,itemsStr,opStr,testStr,trueStr,falseStr] = str.split(/\r?\n/)
@@ -48,7 +48,7 @@ function part1(data) {
 
 }
 
-function part2(data) {
+export function part2(data) {
 
     const monkeys = data.split(/\r?\n\r?\n/).map( str => {
         const [monkeyId,itemsStr,opStr,testStr,trueStr,falseStr] = str.split(/\r?\n/)
@@ -108,5 +108,3 @@ function part2(data) {
     return monkeys.map(({inspections}) => inspections).sort( (a,b) => b - a ).slice(0,2).reduce( (x,a) => x * a, 1 )
 
 }
-
-module.exports = { part1, part2 }

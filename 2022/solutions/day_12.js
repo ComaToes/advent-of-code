@@ -78,7 +78,7 @@ function aStar(start, h, found) {
 
 }
 
-function part1(data) {
+export function part1(data) {
 
     const {grid, start, end} = parseGrid(data)
 
@@ -96,7 +96,7 @@ function part1(data) {
 
 }
 
-function part2(data) {
+export function part2(data) {
 
     const {grid, end} = parseGrid(data)
 
@@ -115,5 +115,3 @@ function part2(data) {
     return aStar(end, h, found)
 
 }
-
-module.exports = { part1, part2 }

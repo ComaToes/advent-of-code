@@ -13,7 +13,7 @@ const winScore = {
     Z: { A: 0, B: 6, C: 3 },
 }
 
-function part1(data) {
+export function part1(data) {
 
     const moves = data.split(/\r?\n/).map( 
         line =>  line.split(/\s+/)
@@ -35,7 +35,7 @@ const objectiveScore = {
     Z: 6,
 }
 
-function part2(data) {
+export function part2(data) {
 
     const moves = data.split(/\r?\n/).map( 
         line =>  line.split(/\s+/)
@@ -44,5 +44,3 @@ function part2(data) {
     return moves.reduce( (score, [them, objective]) => score + objectiveScore[objective] + shapeScore[ tactic[them][objective] ], 0 )
 
 }
-
-module.exports = { part1, part2 }

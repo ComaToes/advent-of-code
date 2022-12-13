@@ -42,7 +42,7 @@ function compare(a, b) {
 
 }
 
-function part1(data) {
+export function part1(data) {
 
     const pairs = data.split(/\r?\n\r?\n/).map( str => str.split(/\r?\n/).map(JSON.parse) )
 
@@ -59,7 +59,7 @@ function part1(data) {
 
 }
 
-function part2(data) {
+export function part2(data) {
 
     const pairs = data.split(/\r?\n\r?\n/).map( str => str.split(/\r?\n/).map(JSON.parse) ).flat()
 
@@ -73,5 +73,3 @@ function part2(data) {
     return (pairs.indexOf(dividerA) + 1) * (pairs.indexOf(dividerB) + 1)
 
 }
-
-module.exports = { part1, part2 }

@@ -1,4 +1,4 @@
-function part1(data) {
+export function part1(data) {
 
     const pairs = data.split(/\r?\n/).map( 
         line => line.split(",").map( range => range.split("-").map(Number) )
@@ -12,7 +12,7 @@ function part1(data) {
 
 }
 
-function part2(data) {
+export function part2(data) {
 
     const pairs = data.split(/\r?\n/).map( 
         line => line.split(",").map( range => range.split("-").map(Number) )
@@ -25,5 +25,3 @@ function part2(data) {
     return overlapped.length
 
 }
-
-module.exports = { part1, part2 }

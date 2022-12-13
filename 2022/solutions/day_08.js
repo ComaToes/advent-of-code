@@ -9,7 +9,7 @@ function getVisibilityAlong(arr) {
     })
 }
 
-function part1(data) {
+export function part1(data) {
 
     const gridRows = data.split(/\r?\n/).map( row => row.split('').map(Number) )
     const width = gridRows[0].length
@@ -54,7 +54,7 @@ function getViewsAlong(arr) {
     })
 }
 
-function part2(data) {
+export function part2(data) {
 
     const gridRows = data.split(/\r?\n/).map( row => row.split('').map(Number) )
     const width = gridRows[0].length
@@ -86,5 +86,3 @@ function part2(data) {
     return combinedViews.flat().reduce( (max,v) => max > v ? max : v, 0 )
 
 }
-
-module.exports = { part1, part2 }

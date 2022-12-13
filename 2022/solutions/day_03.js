@@ -1,7 +1,7 @@
 const upperPriority = [...Array(26).keys()].reduce( (p,i) => (p[String.fromCharCode(65+i)] = i+27) && p, {} )
 const priority = [...Array(26).keys()].reduce( (p,i) => (p[String.fromCharCode(97+i)] = i+1) && p, upperPriority )
 
-function part1(data) {
+export function part1(data) {
 
     const packs = data.split(/\r?\n/).map( 
         line => [line.slice(0, line.length/2).split("").sort(), line.slice(line.length/2).split("").sort()]
@@ -24,7 +24,7 @@ function part1(data) {
 }
 
 
-function part2(data) {
+export function part2(data) {
 
     const packs = data.split(/\r?\n/)
 
@@ -53,5 +53,3 @@ function part2(data) {
     return scores.reduce( (c, s) => c + s, 0 )
 
 }
-
-module.exports = { part1, part2 }
