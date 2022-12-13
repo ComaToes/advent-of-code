@@ -4,7 +4,7 @@ function zip(a,b) {
 
 function compare(a, b) {
 
-    const stack = [[a,b]]
+    const stack = [[a, b]]
 
     while( stack.length > 0 ) {
 
@@ -13,18 +13,28 @@ function compare(a, b) {
         const leftIsArr = Array.isArray(left)
         const rightIsArr = Array.isArray(right)
 
+        // Zip array pairs onto the stack
         if( leftIsArr && rightIsArr )
             stack.unshift( ...zip(left, right) )
-        else if( rightIsArr && left != undefined )
+
+        // Left has run out of items
+        else if( left == undefined )
+            return -1
+        // Right has run out of items
+        else if( right == undefined )
+            return 1
+
+        // Comparing array vs int, wrap the int
+        else if( rightIsArr )
             stack.unshift( [[left], right] )
-        else if( leftIsArr && right != undefined )
+        else if( leftIsArr )
             stack.unshift( [left, [right]] )
-        else {
-            if( left == undefined || left < right )
-                return -1
-            if( right == undefined || right < left )
-                return 1
-        }
+
+        // Comparing ints
+        else if( left < right )
+            return -1
+        else if( right < left )
+            return 1
         
     }
 
@@ -38,14 +48,14 @@ function part1(data) {
 
     const correctIndices = []
 
-    pairs.forEach( ([a,b],i) => {
+    pairs.forEach( ([a, b], i) => {
 
         if( compare(a, b) < 0 )
             correctIndices.push(i+1)
 
     })
 
-    return correctIndices.reduce( (sum,a) => sum + a, 0 )
+    return correctIndices.reduce( (sum, a) => sum + a, 0 )
 
 }
 
@@ -56,11 +66,11 @@ function part2(data) {
     const dividerA = [[2]]
     const dividerB = [[6]]
 
-    pairs.push( dividerA, dividerB )
+    pairs.push(dividerA, dividerB)
 
-    pairs.sort( compare )
+    pairs.sort(compare)
 
-    return (pairs.indexOf( dividerA ) + 1) * (pairs.indexOf( dividerB ) + 1)
+    return (pairs.indexOf(dividerA) + 1) * (pairs.indexOf(dividerB) + 1)
 
 }
 
