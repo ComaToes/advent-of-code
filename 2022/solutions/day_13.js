@@ -44,7 +44,7 @@ function compare(a, b) {
 
 function part1(data) {
 
-    const pairs = data.split(/\r?\n\r?\n/).map( str => str.split(/\r?\n/).map(eval) )
+    const pairs = data.split(/\r?\n\r?\n/).map( str => str.split(/\r?\n/).map(JSON.parse) )
 
     const correctIndices = []
 
@@ -61,7 +61,7 @@ function part1(data) {
 
 function part2(data) {
 
-    const pairs = data.split(/\r?\n\r?\n/).map( str => str.split(/\r?\n/).map(eval) ).flat()
+    const pairs = data.split(/\r?\n\r?\n/).map( str => str.split(/\r?\n/).map(JSON.parse) ).flat()
 
     const dividerA = [[2]]
     const dividerB = [[6]]
