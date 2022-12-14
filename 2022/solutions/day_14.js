@@ -76,12 +76,6 @@ function dropSand({grid, width, height, xOffset}, stopOnOverflow = false) {
                 break
             }
 
-            // overflow left/right
-            if( x == 0 ) {
-                leftHeight = height - y - 1
-            } else if( x == width-1 )
-                rightHeight = height - y - 1
-
             // slide
             if( grid[y+1][x-1] == 0 ) {
                 y++
@@ -95,6 +89,12 @@ function dropSand({grid, width, height, xOffset}, stopOnOverflow = false) {
                 count++
                 falling = false
 
+                // overflow left/right
+                if( x == 0 ) {
+                    leftHeight = height - y - 1
+                } else if( x == width-1 )
+                    rightHeight = height - y - 1
+
                 // end simulation if stopping at spawn
                 if(y == 0)
                     filling = false
@@ -102,10 +102,9 @@ function dropSand({grid, width, height, xOffset}, stopOnOverflow = false) {
 
         }
 
-
     }
 
-    const arithSum = (x) => x / 2 * (x + 1);
+    const arithSum = (x) => x / 2 * (x + 1)
 
     const leftCount = arithSum(leftHeight)
     const rightCount = arithSum(rightHeight)
