@@ -90,9 +90,9 @@ function dropSand({grid, width, height, xOffset}, stopOnOverflow = false) {
                 falling = false
 
                 // overflow left/right
-                if( x == 0 ) {
+                if( x == 0 )
                     leftHeight = height - y - 1
-                } else if( x == width-1 )
+                else if( x == width-1 )
                     rightHeight = height - y - 1
 
                 // end simulation if stopping at spawn
