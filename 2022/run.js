@@ -1,16 +1,16 @@
 import fs from "node:fs/promises"
 import moment from "moment"
 import argsParser from "args-parser"
+import {exec as rawExec} from "node:child_process"
+import {promisify} from "node:util"
 
-async function runDay(day, mode) {
-    
-    const moduleName = `day_${String(day).padStart(2,'0')}`
+const exec = promisify(rawExec)
+
+async function runJS(moduleName, mode) {
     
     const {part1, part2} = await import(`./solutions/${moduleName}.js`)
 
     const data = await fs.readFile(`input/${moduleName}_${mode}`, "utf8")
-
-    console.log(`Running ${moduleName}`)
 
     console.time("Part 1")
     const res1 = part1(data)
@@ -26,19 +26,47 @@ async function runDay(day, mode) {
 
 }
 
-async function runAll(mode) {
+async function runGo(moduleName, mode) {
+
+    const goSrc = `solutions.go/${moduleName}.go`
+    const inputFile = `input/${moduleName}_${mode}`
+
+    await fs.stat(goSrc)
+
+    const {stdout, stderr} = await exec(`go run ${goSrc} ${inputFile}`)
+
+    if( stdout )
+        console.log(stdout)
+    if( stderr )
+        console.log(stderr)
+
+}
+
+async function runDay(lang, day, mode) {
+    const moduleName = `day_${String(day).padStart(2,'0')}`
+    console.log(`Running ${moduleName}.${lang}`)
+    switch(lang) {
+        case "js": return runJS(moduleName, mode)
+        case "go": return runGo(moduleName, mode)
+        default:
+            throw new Error("wut?")
+    }
+}
+
+async function runAll(lang, mode) {
     for( let day = 1; day < 26; day++ )
-        await runDay(day, mode)
+        await runDay(lang, day, mode)
 }
 
 const args = argsParser(process.argv)
 const day = args.day || moment().format("D")
-const mode = args.mode || "sample"
+const mode = args.live ? "live" : (args.mode || "sample")
+const lang = args.go ? "go" : (args.lang || "js")
 
 if( args.all )
-    runAll(mode).catch( err => {
+    runAll(lang, mode).catch( err => {
         if( err.code != "ERR_MODULE_NOT_FOUND" )
             console.error(err) 
     })
 else
-    runDay(day, mode).catch( console.error )
+    runDay(lang, day, mode).catch( console.error )
