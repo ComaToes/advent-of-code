@@ -121,6 +121,7 @@ export function part1(data) {
 
 // Original simulation approach works fine, but faster 
 // solutions below
+// ~19ms
 export function part2original(data) {
 
     return dropSand( parseData(data) )
@@ -129,7 +130,8 @@ export function part2original(data) {
 
 // Create the sand top-down from spawn in a single pass
 // Sand settles here if one of the three tiles above has sand
-export function part2b(data) {
+// ~6.5ms
+export function part2a(data) {
 
     const lines = data.split(/\r?\n/).map( line => line.split(/\s->\s/).map( coords => coords.split(",").map(Number) ) )
 
@@ -187,7 +189,8 @@ export function part2b(data) {
 // Top-down again, but also skip examining beyond the wall
 // x-bounds as these are full triangles of sand whose area
 // can be calculated from the height
-export function part2(data) {
+// ~4ms
+export function part2b(data) {
 
     const lines = data.split(/\r?\n/).map( line => line.split(/\s->\s/).map( coords => coords.split(",").map(Number) ) )
 
@@ -267,5 +270,69 @@ export function part2(data) {
     const rightCount = arithSum(rightHeight)
 
     return count + leftCount + rightCount
+
+}
+
+// Top-down single-pass x-bounded again, but counting voids instead of sand
+// ~3.5ms
+export function part2(data) {
+
+    const lines = data.split(/\r?\n/).map( line => line.split(/\s->\s/).map( coords => coords.split(",").map(Number) ) )
+
+    const blocked = {}
+
+    let maxY = 0, minX = Infinity, maxX = 0
+    let count = 0
+
+    lines.forEach( points => {
+        let [x,y] = points.shift()
+        blocked[y] = blocked[y] || {}
+        if( !blocked[y][x] )
+            count++
+        blocked[y][x] = true
+        while( points.length > 0 ) {
+            let [nx,ny] = points.shift()
+            while( x != nx ) {
+                x += Math.sign(nx - x)
+                blocked[y] = blocked[y] || {}
+                if( !blocked[y][x] )
+                    count++
+                blocked[y][x] = true
+                
+            }
+            while( y != ny ) {
+                y += Math.sign(ny - y)
+                blocked[y] = blocked[y] || {}
+                if( !blocked[y][x] )
+                    count++
+                blocked[y][x] = true
+            }
+            x = nx
+            y = ny
+            if( y > maxY )
+                maxY = y
+            if( x < minX )
+                minX = x
+            if( x > maxX )
+                maxX = x
+        }
+    })
+
+    const height = maxY + 2
+
+    for( let y = 1; y < height; y++ ) {
+        blocked[y] = blocked[y] || {}
+        blocked[y-1] = blocked[y-1] || {}
+        const startX = Math.max( 500-y, minX )
+        const endX = Math.min( 500+y, maxX )
+        for( let x = startX; x <= endX; x++ ) {
+            if( (!blocked[y][x]) && blocked[y-1][x-1] && blocked[y-1][x] && blocked[y-1][x+1] ) {
+                count++
+                blocked[y][x] = true
+            }
+        }
+    }
+
+    return height * height - count
 
 }
