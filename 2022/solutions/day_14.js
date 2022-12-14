@@ -23,9 +23,9 @@ function parseData(data) {
     // draw lines
     lines.forEach( points => {
         let [x,y] = points.shift()
+        grid[y][x+xOffset] = 1
         while( points.length > 0 ) {
             let [nx,ny] = points.shift()
-            grid[y][x+xOffset] = 1
             while( x != nx ) {
                 x += Math.sign(nx - x)
                 grid[y][x+xOffset] = 1
@@ -119,8 +119,153 @@ export function part1(data) {
 
 }
 
-export function part2(data) {
+// Original simulation approach works fine, but faster 
+// solutions below
+export function part2original(data) {
 
     return dropSand( parseData(data) )
+
+}
+
+// Create the sand top-down from spawn in a single pass
+// Sand settles here if one of the three tiles above has sand
+export function part2b(data) {
+
+    const lines = data.split(/\r?\n/).map( line => line.split(/\s->\s/).map( coords => coords.split(",").map(Number) ) )
+
+    const blocked = {}
+
+    let maxY = 0
+
+    lines.forEach( points => {
+        let [x,y] = points.shift()
+        blocked[x] = blocked[x] || {}
+        blocked[x][y] = true
+        while( points.length > 0 ) {
+            let [nx,ny] = points.shift()
+            while( x != nx ) {
+                x += Math.sign(nx - x)
+                blocked[x] = blocked[x] || {}
+                blocked[x][y] = true
+            }
+            while( y != ny ) {
+                y += Math.sign(ny - y)
+                blocked[x] = blocked[x] || {}
+                blocked[x][y] = true
+            }
+            x = nx
+            y = ny
+            if( y > maxY )
+                maxY = y
+        }
+    })
+
+    let count = 1
+    let lastMin = 500
+    let lastRow = new Set()
+    lastRow.add(500)
+    for( let y = 1; y < maxY + 2; y++ ) {
+        const width = 2 * y + 1
+        const row = new Set()
+        for( let dx = 0; dx <= width; dx++ ) {
+            const x = lastMin - 1 + dx
+            if( blocked[x] && blocked[x][y] )
+                continue
+            if( lastRow.has(x-1) || lastRow.has(x) || lastRow.has(x+1) ) {
+                row.add(x)
+                count++
+            }
+        }
+        lastMin--
+        lastRow = row
+    }
+
+    return count
+
+}
+
+// Top-down again, but also skip examining beyond the wall
+// x-bounds as these are full triangles of sand whose area
+// can be calculated from the height
+export function part2(data) {
+
+    const lines = data.split(/\r?\n/).map( line => line.split(/\s->\s/).map( coords => coords.split(",").map(Number) ) )
+
+    const blocked = {}
+
+    let maxY = 0, minX = Infinity, maxX = 0
+
+    lines.forEach( points => {
+        let [x,y] = points.shift()
+        blocked[x] = blocked[x] || {}
+        blocked[x][y] = true
+        while( points.length > 0 ) {
+            let [nx,ny] = points.shift()
+            while( x != nx ) {
+                x += Math.sign(nx - x)
+                blocked[x] = blocked[x] || {}
+                blocked[x][y] = true
+            }
+            while( y != ny ) {
+                y += Math.sign(ny - y)
+                blocked[x] = blocked[x] || {}
+                blocked[x][y] = true
+            }
+            x = nx
+            y = ny
+            if( y > maxY )
+                maxY = y
+            if( x < minX )
+                minX = x
+            if( x > maxX )
+                maxX = x
+        }
+    })
+
+    maxX++
+    minX--
+    maxY++
+
+    let count = 1
+    let leftHeight = 0
+    let rightHeight = 0
+    let lastMin = 500
+    let lastRow = new Set()
+    lastRow.add(500)
+    for( let y = 1; y < maxY + 1; y++ ) {
+        const row = new Set()
+        let startX
+        let endX
+
+        startX = lastMin - 1
+        if( startX < minX )
+            startX = minX - 1
+
+        endX = startX + 2 * y + 1
+        if( endX > maxX + 2 )
+            endX = maxX + 2
+
+        for( let x = startX; x < endX; x++ ) {
+            if( blocked[x] && blocked[x][y] )
+                continue
+            if( lastRow.has(x-1) || lastRow.has(x) || lastRow.has(x+1) ) {
+                if( x == minX && leftHeight == 0 )
+                    leftHeight = maxY - y - 1
+                if( x == maxX+1 && rightHeight == 0 )
+                    rightHeight = maxY - y
+                row.add(x)
+                count++
+            }
+        }
+        lastMin--
+        lastRow = row
+    }
+
+    const arithSum = (x) => x / 2 * (x + 1)
+
+    const leftCount = arithSum(leftHeight)
+    const rightCount = arithSum(rightHeight)
+
+    return count + leftCount + rightCount
 
 }
