@@ -36,7 +36,6 @@ func main() {
 		us := translations[chars[1]]
 		p1score += 1 + us + (us-them+4)%3*3
 		p2score += 1 + us*3 + (them+us+5)%3
-
 	}
 
 	fmt.Println(p1score)
