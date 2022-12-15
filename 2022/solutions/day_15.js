@@ -53,7 +53,6 @@ export function part2(data) {
     const maxXY = 4000000
 
     let allLines = {}
-    const beacons = new Set()
 
     sensors.forEach( ({x,y,bx,by}) => {
         const md = Math.abs(x-bx) + Math.abs(y-by)
@@ -64,9 +63,10 @@ export function part2(data) {
             const dx = md - Math.abs(lineY-y)
             const nx1 = Math.max( x-dx, minXY )
             const nx2 = Math.min( x+dx, maxXY )
-            const overlaps = allLines[lineY].filter( ([x1,x2]) => (x2 >= nx1 && x2 <= nx2) || (x1 >= nx1 && x1 <= nx2) || (x1 <= nx1 && x2 >= nx2) || (x2 == nx1-1 || x1 == nx2+1 ) )
+            const overlapBools = allLines[lineY].map( ([x1,x2]) => (x2 >= nx1 && x2 <= nx2) || (x1 >= nx1 && x1 <= nx2) || (x1 <= nx1 && x2 >= nx2) || (x2 == nx1-1 || x1 == nx2+1 ) )
+            const overlaps = allLines[lineY].filter( (_,i) => overlapBools[i] )
             if( overlaps.length > 0 ) {
-                allLines[lineY] = allLines[lineY].filter( ([x1,x2]) => !((x2 >= nx1 && x2 <= nx2) || (x1 >= nx1 && x1 <= nx2) || (x1 <= nx1 && x2 >= nx2) || (x2 == nx1-1 || x1 == nx2+1 )) )
+                allLines[lineY] = allLines[lineY].filter( (_,i) => !overlapBools[i] )
                 const cx1 = Math.min( nx1, ...overlaps.map( ([x1,x2]) => x1 ) )
                 const cx2 = Math.max( nx2, ...overlaps.map( ([x1,x2]) => x2 ) )
                 allLines[lineY].push([cx1,cx2])
@@ -76,7 +76,7 @@ export function part2(data) {
         }
     })
 
-    const [y,ranges] = Object.entries(allLines).filter( ([y,line]) => line.length > 1 ).flat()
+    const [y,ranges] = Object.entries(allLines).filter( ([_,line]) => line.length > 1 ).flat()
     const x = BigInt( ranges.filter(([x1,x2])=>x1==0)[0][1] + 1 )
     return x * 4000000n + BigInt(y)
 
