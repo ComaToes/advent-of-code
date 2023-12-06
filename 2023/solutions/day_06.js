@@ -23,9 +23,10 @@ export function part2(data) {
 
     const [t,d] =  data.split(/\r?\n/).map( line => line.split(/:\s+/)[1].replaceAll(/\s/g,"") ).map(Number)
 
-    const a = Math.ceil( (-t + Math.sqrt( t*t - 4*d )) / -2 )
-    const b = Math.ceil( (-t - Math.sqrt( t*t - 4*d )) / -2 )
+    const sqrtDisc = Math.sqrt( t*t - 4*d )
+    const a = Math.ceil( (t + sqrtDisc) / 2 )
+    const b = Math.ceil( (t - sqrtDisc) / 2 )
 
-    return b - a
+    return a - b
 
 }
